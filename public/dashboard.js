@@ -3,6 +3,7 @@ const mapEl = document.getElementById("map");
 const overlay = document.getElementById("overlay");
 const overlayText = document.getElementById("overlay-text");
 const vitals = document.getElementById("vitals");
+const intel = document.getElementById("intel");
 const searchInput = document.getElementById("search");
 const searchBtn = document.getElementById("searchBtn");
 const targetsList = document.getElementById("targets-list");
@@ -29,6 +30,30 @@ function showOverlay(text) {
   overlay.classList.remove("hidden");
 }
 function hideOverlay() { overlay.classList.add("hidden"); }
+
+async function reverseGeocode(lat, lon) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+    const res = await fetch(url, { headers: { "Accept": "application/json" } });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch { return null; }
+}
+
+function setIntel(geo) {
+  if (!geo) {
+    intel.classList.add("hidden");
+    return;
+  }
+  const a = geo.address || {};
+  document.getElementById("i-address").textContent = geo.display_name || "—";
+  document.getElementById("i-road").textContent = [a.house_number, a.road].filter(Boolean).join(" ") || "—";
+  document.getElementById("i-city").textContent = a.city || a.town || a.village || a.suburb || a.hamlet || "—";
+  document.getElementById("i-region").textContent = a.state || a.region || a.province || "—";
+  document.getElementById("i-postal").textContent = a.postcode || "—";
+  document.getElementById("i-country").textContent = a.country || "—";
+  intel.classList.remove("hidden");
+}
 
 function setVitals(t) {
   document.getElementById("v-name").textContent = t.name;
@@ -108,6 +133,9 @@ async function locate(name) {
   }).addTo(leafletMap);
 
   setVitals(target);
+
+  const geo = await reverseGeocode(target.lat, target.lon);
+  setIntel(geo);
 }
 
 searchBtn.onclick = () => locate(searchInput.value.trim());
