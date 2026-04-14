@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tracker</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #000; color: #00ff9c;
+         display: flex; flex-direction: column; align-items: center; justify-content: center;
+         min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+  h1 { letter-spacing: 4px; }
+  .status { margin-top: 20px; font-size: 14px; opacity: 0.8; }
+  .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+         background: #00ff9c; box-shadow: 0 0 10px #00ff9c; animation: pulse 1.5s infinite; }
+  @keyframes pulse { 50% { opacity: 0.3; } }
+  button { margin-top: 30px; background: #00ff9c; color: #000; border: none;
+           padding: 14px 28px; font-size: 16px; font-weight: bold; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+  <h1>TRACKER</h1>
+  <div><span class="dot"></span> <span id="who">…</span></div>
+  <div class="status" id="status">Tap START to begin sharing location.</div>
+  <button id="startBtn">START</button>
+
+<script>
+const params = new URLSearchParams(location.search);
+const name = params.get("name") || "Unknown";
+document.getElementById("who").textContent = name.toUpperCase();
+
+let watchId = null;
+let pings = 0;
+
+async function getBattery() {
+  if (!navigator.getBattery) return null;
+  try { const b = await navigator.getBattery(); return b.level; } catch { return null; }
+}
+
+async function send(pos) {
+  const battery = await getBattery();
+  try {
+    await fetch("/api/ping", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        lat: pos.coords.latitude,
+        lon: pos.coords.longitude,
+        accuracy: pos.coords.accuracy,
+        speed: pos.coords.speed,
+        heading: pos.coords.heading,
+        battery
+      })
+    });
+    pings++;
+    document.getElementById("status").textContent =
+      `Sharing live location · ${pings} pings · ±${Math.round(pos.coords.accuracy)}m`;
+  } catch (e) {
+    document.getElementById("status").textContent = "Connection error: " + e.message;
+  }
+}
+
+document.getElementById("startBtn").onclick = () => {
+  if (!navigator.geolocation) {
+    document.getElementById("status").textContent = "Geolocation not supported.";
+    return;
+  }
+  document.getElementById("startBtn").style.display = "none";
+  document.getElementById("status").textContent = "Requesting location…";
+  watchId = navigator.geolocation.watchPosition(
+    send,
+    err => { document.getElementById("status").textContent = "Error: " + err.message; },
+    { enableHighAccuracy: true, maximumAge: 5000, timeout: 20000 }
+  );
+};
+</script>
+</body>
+</html>

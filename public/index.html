@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GOD'S EYE</title>
+<link rel="stylesheet" href="dashboard.css" />
+<script src="https://unpkg.com/three@0.149.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="globe"></div>
+  <div id="map" class="hidden"></div>
+
+  <div class="hud top-left">
+    <div class="logo">G O D ' S &nbsp; E Y E</div>
+    <div class="sub">SURVEILLANCE GRID v0.1</div>
+  </div>
+
+  <div class="hud top-right">
+    <div id="clock"></div>
+    <div id="status">SYSTEM: ONLINE</div>
+  </div>
+
+  <div class="hud bottom-center search-box">
+    <input id="search" type="text" placeholder="ENTER TARGET NAME" autocomplete="off" />
+    <button id="searchBtn">LOCATE</button>
+  </div>
+
+  <div id="vitals" class="hud bottom-right hidden">
+    <div class="row"><span>TARGET</span><b id="v-name">—</b></div>
+    <div class="row"><span>LAT</span><b id="v-lat">—</b></div>
+    <div class="row"><span>LON</span><b id="v-lon">—</b></div>
+    <div class="row"><span>ACCURACY</span><b id="v-acc">—</b></div>
+    <div class="row"><span>BATTERY</span><b id="v-bat">—</b></div>
+    <div class="row"><span>LAST PING</span><b id="v-time">—</b></div>
+  </div>
+
+  <div id="overlay" class="overlay hidden">
+    <div class="scan"></div>
+    <div class="overlay-text" id="overlay-text">TRIANGULATING...</div>
+  </div>
+
+  <div id="targets" class="hud bottom-left">
+    <div class="title">ACTIVE TARGETS</div>
+    <ul id="targets-list"></ul>
+  </div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

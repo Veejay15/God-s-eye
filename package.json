@@ -1,0 +1,13 @@
+{
+  "name": "gods-eye",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.37.0",
+    "express": "^4.19.2"
+  }
+}
